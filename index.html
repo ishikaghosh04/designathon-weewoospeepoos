@@ -4,56 +4,176 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Little Ocean</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pixelify+Sans&display=swap">
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .studio {
+      min-height: 100svh;
+      padding: 12px;
+    }
+
+    .studio,
+    .ocean {
+      background: #67b9cd url("./ocean-pastel.png") center bottom / cover no-repeat;
+    }
+
+    .studio .studio-layout {
+      width: min(100%, 600px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .studio .fish-dialog {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+      align-items: end;
+      gap: 12px;
+      padding: 10px 12px;
+    }
+
+    .studio .fish-dialog label {
+      font-size: 1.25rem;
+    }
+
+    .studio .fish-dialog #fish-name {
+      min-width: 0;
+      padding: 0.25rem 0;
+    }
+
+    .studio .fish-dialog-buttons {
+      margin-top: 0;
+    }
+
+    .studio .paint-window {
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .studio .paint-titlebar h1 {
+      font: inherit;
+      margin: 0;
+    }
+
+    .studio .paint-titlebar h1:focus {
+      outline: none;
+    }
+
+    /* Shrink the displayed board on short screens while keeping its proportions. */
+    .studio .drawing-board {
+      width: min(100%, clamp(140px, calc(156.25svh - 310px), 500px));
+      justify-self: center;
+    }
+
+    .studio .palette {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .studio .swatch {
+      width: 100%;
+      height: 22px;
+    }
+
+    @media (max-width: 540px) {
+      .studio .fish-dialog {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 700px), (max-height: 560px) {
+      .studio .paint-workspace {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .studio .paint-toolbox {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .studio .paint-tool-group {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .studio .paint-toolbox button {
+        min-width: 0;
+        padding-inline: 1px;
+        font-size: 0.7rem;
+      }
+
+      .studio .paint-tool-label {
+        display: none;
+      }
+
+      .studio .drawing-board {
+        width: min(100%, clamp(130px, calc(156.25svh - 375px), 500px));
+      }
+    }
+  </style>
+
   <script src="script.js" defer></script>
 </head>
 <body>
   <main>
     <section id="studio" class="studio" aria-labelledby="studio-title">
-      <div class="card">
-        <header class="intro">
-          <h1 id="studio-title" tabindex="-1">Draw your fish</h1>
-          <p>Give your fish some color, a name, and an ocean to explore.</p>
-        </header>
+      <div class="studio-layout">
 
-        <div class="drawing-board">
-          <!-- The guide sits behind the canvas so it stays out of the exported drawing. -->
-          <svg class="guide" viewBox="0 0 500 320" aria-hidden="true">
-            <path d="M153 160 C210 68 353 85 409 160
-                     C353 235 210 252 153 160 Z
-                     M153 160 Q112 113 76 112 Q95 160 76 208
-                     Q112 207 153 160 Z"/>
-            <circle cx="355" cy="144" r="7"/>
-          </svg>
-          <canvas id="drawing" width="500" height="320"
-                  aria-label="Fish drawing canvas"></canvas>
-        </div>
+        <div class="fish-dialog">
+          <div>
+            <label for="fish-name">Insert Your Name ...</label>
+            <input id="fish-name" type="text" maxlength="16"
+                   placeholder="e.g. Bubbles" autocomplete="off">
+          </div>
 
-        <div class="tools">
-          <div id="palette" class="palette" role="group" aria-label="Brush color"></div>
-          <div class="tool-row">
-            <div class="sizes" role="group" aria-label="Brush size">
-              <button type="button" data-size="4" aria-pressed="false">Small</button>
-              <button type="button" data-size="10" aria-pressed="true">Medium</button>
-              <button type="button" data-size="22" aria-pressed="false">Large</button>
-            </div>
-            <div class="actions" role="group" aria-label="Drawing tools">
-              <button id="eraser" type="button" aria-pressed="false">Eraser</button>
-              <button id="undo" type="button" disabled>Undo</button>
-              <button id="clear" type="button" disabled>Clear</button>
-            </div>
+          <div class="fish-dialog-buttons">
+            <button id="visit" type="button">Visit the ocean</button>
+            <button id="release" type="button" disabled>Release into the ocean</button>
           </div>
         </div>
 
-        <label class="name-label" for="fish-name">Fish name</label>
-        <input id="fish-name" type="text" maxlength="16"
-               placeholder="e.g. Bubbles" autocomplete="off">
+        <div class="paint-window">
+          <header class="paint-titlebar">
+            <h1 id="studio-title" tabindex="-1">Untitled - Fish Paint</h1>
+            <span class="paint-dimensions">500 × 320</span>
+          </header>
 
-        <button id="release" class="primary" type="button" disabled>
-          Release into the ocean
-        </button>
-        <button id="visit" class="quiet" type="button">Visit the ocean</button>
+          <div class="paint-workspace">
+            <div class="paint-toolbox">
+              <div class="paint-tool-group" role="group" aria-label="Brush size">
+                <span class="paint-tool-label" aria-hidden="true">Brush size</span>
+                <button type="button" data-size="4" aria-pressed="false">Small</button>
+                <button type="button" data-size="10" aria-pressed="true">Medium</button>
+                <button type="button" data-size="22" aria-pressed="false">Large</button>
+              </div>
+
+              <div class="paint-tool-group" role="group" aria-label="Drawing tools">
+                <button id="eraser" type="button" aria-pressed="false">Eraser</button>
+                <button id="undo" type="button" disabled>Undo</button>
+                <button id="clear" type="button" disabled>Clear</button>
+              </div>
+            </div>
+
+            <div class="drawing-board">
+              <!-- The guide sits behind the canvas and stays out of exported fish. -->
+              <svg class="guide" viewBox="0 0 500 320" aria-hidden="true">
+                <path d="M153 160 C210 68 353 85 409 160
+                         C353 235 210 252 153 160 Z
+                         M153 160 Q112 113 76 112 Q95 160 76 208
+                         Q112 207 153 160 Z"/>
+                <circle cx="355" cy="144" r="7"/>
+              </svg>
+
+              <canvas id="drawing" width="500" height="320"
+                      aria-label="Fish drawing canvas"></canvas>
+            </div>
+          </div>
+
+          <div class="paint-footer">
+            <div id="palette" class="palette" role="group" aria-label="Brush color"></div>
+            <p class="paint-status">Trace the dotted fish or draw your own.</p>
+          </div>
+        </div>
+
       </div>
     </section>
 
