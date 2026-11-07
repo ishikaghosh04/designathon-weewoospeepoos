@@ -1,0 +1,241 @@
+:root {
+  font-family: "Nunito", system-ui, sans-serif;
+  color: #173d47;
+  background: #dcf7f2;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+
+button, input { font: inherit; }
+
+button {
+  padding: 0.55rem 0.85rem;
+  border: 1px solid #b5dcd7;
+  border-radius: 999px;
+  background: #fff;
+  color: #173d47;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button:focus-visible, input:focus-visible {
+  outline: 3px solid #337ac1;
+  outline-offset: 3px;
+}
+
+button[aria-pressed="true"] {
+  background: #d4f4ed;
+  border-color: #33877e;
+}
+
+.studio {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: radial-gradient(ellipse at top, #f3fffb, #c7efeb);
+}
+
+.card {
+  width: min(100%, 554px);
+  padding: clamp(1rem, 4vw, 1.6rem);
+  border: 1px solid #fff;
+  border-radius: 1.5rem;
+  background: #f6fffd;
+  box-shadow: 0 14px 40px #194b4a1a;
+}
+
+.intro { text-align: center; }
+h1 { margin: 0; font-weight: 900; }
+.intro p { margin: 0.35rem 0 1rem; }
+
+.drawing-board {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #acdcd5;
+  border-radius: 1rem;
+  background: #e5f9f6;
+}
+
+.guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  fill: none;
+  stroke: #4d938d;
+  stroke-width: 3;
+  stroke-dasharray: 7 8;
+  opacity: 0.32;
+}
+
+#drawing {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.tools {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.9rem 0 1rem;
+}
+
+.palette, .tool-row, .sizes, .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.palette { justify-content: center; }
+.tool-row { justify-content: space-between; }
+
+.swatch, .swatch[aria-pressed="true"] {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--swatch);
+  border: 2px solid #173d4733;
+}
+
+.swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px #f6fffd, 0 0 0 4px #173d47;
+}
+
+.name-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 800;
+}
+
+#fish-name {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #b5dcd7;
+  border-radius: 0.75rem;
+  color: inherit;
+  background: #fff;
+}
+
+.primary, .quiet { width: 100%; }
+
+.primary {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-color: transparent;
+  background: #176b64;
+  color: #fff;
+}
+
+.quiet {
+  margin-top: 0.35rem;
+  border-color: transparent;
+  background: transparent;
+}
+
+.ocean {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 28% 0%, #f0ffff8c, transparent 50%),
+    linear-gradient(#86ebe5, #228fae 45%, #081d42);
+}
+
+.ocean-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.swimmers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fish {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.fish-art {
+  position: relative;
+  transform: scaleX(var(--facing, 1));
+}
+
+.fish-art img {
+  display: block;
+  width: 100%;
+}
+
+/* The artwork faces right by default. Only the left slice wiggles. */
+.fish-body { clip-path: inset(0 0 0 30%); }
+
+.fish-tail {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 66% 0 0);
+  transform-origin: 33% 50%;
+  animation: tail-wobble 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes tail-wobble {
+  from { transform: skewY(-7deg); }
+  to { transform: skewY(7deg); }
+}
+
+.fish-label {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 0.25rem auto 0;
+  padding: 0.1rem 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #082844c9;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice:empty { display: none; }
+
+.notice {
+  position: fixed;
+  z-index: 3;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  width: fit-content;
+  margin: auto;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 4px 18px #08284433;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fish-tail { animation: none; }
+}

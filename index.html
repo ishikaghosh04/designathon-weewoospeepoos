@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Little Ocean</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main>
+    <section id="studio" class="studio" aria-labelledby="studio-title">
+      <div class="card">
+        <header class="intro">
+          <h1 id="studio-title" tabindex="-1">Draw your fish</h1>
+          <p>Give your fish some color, a name, and an ocean to explore.</p>
+        </header>
+
+        <div class="drawing-board">
+          <!-- The guide sits behind the canvas so it stays out of the exported drawing. -->
+          <svg class="guide" viewBox="0 0 500 320" aria-hidden="true">
+            <path d="M153 160 C210 68 353 85 409 160
+                     C353 235 210 252 153 160 Z
+                     M153 160 Q112 113 76 112 Q95 160 76 208
+                     Q112 207 153 160 Z"/>
+            <circle cx="355" cy="144" r="7"/>
+          </svg>
+          <canvas id="drawing" width="500" height="320"
+                  aria-label="Fish drawing canvas"></canvas>
+        </div>
+
+        <div class="tools">
+          <div id="palette" class="palette" role="group" aria-label="Brush color"></div>
+          <div class="tool-row">
+            <div class="sizes" role="group" aria-label="Brush size">
+              <button type="button" data-size="4" aria-pressed="false">Small</button>
+              <button type="button" data-size="10" aria-pressed="true">Medium</button>
+              <button type="button" data-size="22" aria-pressed="false">Large</button>
+            </div>
+            <div class="actions" role="group" aria-label="Drawing tools">
+              <button id="eraser" type="button" aria-pressed="false">Eraser</button>
+              <button id="undo" type="button" disabled>Undo</button>
+              <button id="clear" type="button" disabled>Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <label class="name-label" for="fish-name">Fish name</label>
+        <input id="fish-name" type="text" maxlength="16"
+               placeholder="e.g. Bubbles" autocomplete="off">
+
+        <button id="release" class="primary" type="button" disabled>
+          Release into the ocean
+        </button>
+        <button id="visit" class="quiet" type="button">Visit the ocean</button>
+      </div>
+    </section>
+
+    <section id="ocean" class="ocean" aria-labelledby="ocean-title" hidden>
+      <div id="swimmers" class="swimmers"></div>
+      <header class="ocean-header">
+        <h1 id="ocean-title" tabindex="-1">Little Ocean</h1>
+        <button id="draw-again" type="button">Draw another fish</button>
+      </header>
+    </section>
+
+    <p id="notice" class="notice" role="status"></p>
+  </main>
+</body>
+</html>
