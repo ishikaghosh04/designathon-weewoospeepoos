@@ -451,6 +451,5 @@ window.addEventListener("resize", () => {
   if (!ocean.hidden) layoutOcean();
 });
 
-samples.forEach((sample, index) => addFish(makeSample(sample, index), index, true));
 savedFish.forEach((fish, index) => addFish(fish, index));
 updateToolSelection();

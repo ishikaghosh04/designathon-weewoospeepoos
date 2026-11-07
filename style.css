@@ -510,3 +510,101 @@ h1 { margin: 0; font-weight: 900; }
     margin-top: 8px;
   }
 }
+#ocean-title,
+#draw-again {
+  font-family: "Pixelify Sans", monospace;
+  color: #171717;
+}
+
+#ocean-title {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+#ocean-title:focus {
+  outline: none;
+}
+
+#draw-again {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #747474;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 3px 3px 0 #171717;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+#draw-again:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #171717;
+}
+:root {
+  --logo-width: clamp(120px, 32vw, 240px);
+  --logo-inset: 12px;
+  --logo-row-height: calc(var(--logo-width) / 3 + 2 * var(--logo-inset));
+}
+
+.site-logo {
+  position: fixed;
+  top: var(--logo-inset);
+  left: var(--logo-inset);
+  z-index: 4;
+  display: block;
+  width: var(--logo-width);
+  height: auto;
+  pointer-events: none;
+}
+
+/* Keep the ocean heading available to screen readers and JavaScript. */
+#ocean-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Keep the button on the right and the fish below the header. */
+.ocean-header {
+  min-height: var(--logo-row-height);
+  justify-content: flex-end;
+  padding-left: calc(var(--logo-width) + 2 * var(--logo-inset));
+}
+
+/* On narrower screens, make room above the drawing controls. */
+@media (max-width: 1140px) {
+  #studio {
+    padding-top: var(--logo-row-height);
+  }
+
+  #studio .drawing-board {
+    width: min(100%, clamp(
+      130px,
+      calc(156.25svh - 375px - 1.5625 * var(--logo-row-height)),
+      500px
+    ));
+  }
+}
+.paint-toolbox button[data-size] {
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.paint-toolbox button[data-size]::before {
+  content: "";
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.paint-toolbox button[data-size="4"]  { --dot-size: 5px; }
+.paint-toolbox button[data-size="10"] { --dot-size: 11px; }
+.paint-toolbox button[data-size="22"] { --dot-size: 19px; }

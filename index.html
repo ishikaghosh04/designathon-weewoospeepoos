@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Little Ocean</title>
+  <title>Packed like Sardines</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pixelify+Sans&display=swap">
   <link rel="stylesheet" href="style.css">
 
@@ -114,10 +114,14 @@
   <script src="script.js" defer></script>
 </head>
 <body>
-  <main>
+    <main>
+        <img class="site-logo"
+         src="./packed-like-sardines-logo.png"
+         alt="Packed Like Sardines"
+         width="2172" height="724">
+
     <section id="studio" class="studio" aria-labelledby="studio-title">
       <div class="studio-layout">
-
         <div class="fish-dialog">
           <div>
             <label for="fish-name">Insert Your Name ...</label>
@@ -141,9 +145,12 @@
             <div class="paint-toolbox">
               <div class="paint-tool-group" role="group" aria-label="Brush size">
                 <span class="paint-tool-label" aria-hidden="true">Brush size</span>
-                <button type="button" data-size="4" aria-pressed="false">Small</button>
-                <button type="button" data-size="10" aria-pressed="true">Medium</button>
-                <button type="button" data-size="22" aria-pressed="false">Large</button>
+                <button type="button" data-size="4" aria-pressed="false"
+                        aria-label="Small brush" title="Small brush"></button>
+                <button type="button" data-size="10" aria-pressed="true"
+                        aria-label="Medium brush" title="Medium brush"></button>
+                <button type="button" data-size="22" aria-pressed="false"
+                        aria-label="Large brush" title="Large brush"></button>
               </div>
 
               <div class="paint-tool-group" role="group" aria-label="Drawing tools">
@@ -180,7 +187,7 @@
     <section id="ocean" class="ocean" aria-labelledby="ocean-title" hidden>
       <div id="swimmers" class="swimmers"></div>
       <header class="ocean-header">
-        <h1 id="ocean-title" tabindex="-1">Little Ocean</h1>
+        <h1 id="ocean-title" tabindex="-1">Packed like Sardines</h1>
         <button id="draw-again" type="button">Draw another fish</button>
       </header>
     </section>
