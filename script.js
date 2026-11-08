@@ -332,13 +332,15 @@ function addFish(data, index, sample = false) {
 }
 
 function layoutOcean() {
-  oceanWidth = ocean.clientWidth;
+  const viewWidth = ocean.clientWidth;
+const areaLeft = ocean.dataset.area === "2" ? viewWidth : 0;
+oceanWidth = swimmers.clientWidth;
   oceanHeight = ocean.clientHeight;
   swimTop = document.querySelector(".ocean-header").offsetHeight + 8;
 
   for (const fish of fishList) {
     const { data } = fish;
-    const maxWidth = Math.min(oceanWidth * 0.3, fish.sample ? 104 : 148);
+    const maxWidth = Math.min(viewWidth * 0.3, fish.sample ? 104 : 148);
     const maxHeight = fish.sample ? 68 : 102;
     const scale = Math.min(maxWidth / data.width, maxHeight / data.height);
 
@@ -351,7 +353,8 @@ function layoutOcean() {
     fish.maxY = Math.max(swimTop, oceanHeight - fish.element.offsetHeight - 12);
 
     const start = fish.sample ? (fish.index % 4 + 0.5) / 4 : random(0.2, 0.8);
-    fish.x = clamp(fish.x ?? fish.minX + start * (fish.maxX - fish.minX), fish.minX, fish.maxX);
+    const spawnX = areaLeft + 8 + start * Math.max(0, viewWidth - data.width * scale - 16);
+    fish.x = clamp(fish.x ?? spawnX, fish.minX, fish.maxX);
     placeFish(fish, 0);
   }
 }
@@ -453,3 +456,161 @@ window.addEventListener("resize", () => {
 
 savedFish.forEach((fish, index) => addFish(fish, index));
 updateToolSelection();
+const oceanArrow = document.querySelector("#ocean-arrow");
+
+function showOceanArea(area) {
+  ocean.dataset.area = area;
+  syncSeafloorArea(area);
+
+  oceanArrow.setAttribute(
+    "aria-label",
+    area === "2" ? "Return to the first ocean area" : "Swim to the next ocean area",
+  );
+}
+
+oceanArrow.addEventListener("click", () => {
+  showOceanArea(ocean.dataset.area === "2" ? "1" : "2");
+});
+
+window.addEventListener("keydown", (event) => {
+  if (ocean.hidden || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+  event.preventDefault();
+  showOceanArea(event.key === "ArrowRight" ? "2" : "1");
+});
+const cursorBubbleImages = [
+  "./assets/bubble-1.png",
+  "./assets/bubble-2.png",
+];
+
+const cursorBubbleMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+let lastCursorBubble = -Infinity;
+let cursorBubbleIndex = 0;
+
+window.addEventListener("pointermove", (event) => {
+  if (event.pointerType !== "mouse" || cursorBubbleMotion.matches) return;
+  if (event.target === document.querySelector("#drawing")) return;
+
+  // Space out bubbles so quick mouse movement doesn't flood the screen.
+  if (event.timeStamp - lastCursorBubble < 45) return;
+  lastCursorBubble = event.timeStamp;
+
+  const bubble = document.createElement("img");
+  bubble.className = "cursor-bubble";
+  bubble.src = cursorBubbleImages[cursorBubbleIndex];
+  bubble.alt = "";
+  bubble.style.left = `${event.clientX}px`;
+  bubble.style.top = `${event.clientY}px`;
+  bubble.style.width = `${32 + Math.random() * 20}px`;
+  bubble.style.setProperty("--bubble-drift", `${Math.random() * 24 - 12}px`);
+
+  cursorBubbleIndex = (cursorBubbleIndex + 1) % cursorBubbleImages.length;
+
+  bubble.addEventListener("animationend", () => bubble.remove(), { once: true });
+  document.body.append(bubble);
+});
+const seafloorAssets = [
+  ["coral-1.png", "Peach coral", ""],
+  ["coral-2.png", "Lavender coral", ""],
+  ["coral-3.png", "Golden coral", ""],
+  ["seaweed-1.png", "Green seaweed", ""],
+  ["seaweed-2.png", "Teal seaweed", ""],
+  ["oyester-1.png", "Oyster", ""],
+  ["starfish-1.png", "Starfish", ""],
+];
+
+const seafloorPanels = [...ocean.querySelectorAll(".ocean-panel")];
+
+// Shuffle once per page load.
+for (let i = seafloorAssets.length - 1; i > 0; i -= 1) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [seafloorAssets[i], seafloorAssets[j]] = [seafloorAssets[j], seafloorAssets[i]];
+}
+
+const firstAreaCount = Math.ceil(seafloorAssets.length / 2);
+const seafloorGroups = [
+  seafloorAssets.slice(0, firstAreaCount),
+  seafloorAssets.slice(firstAreaCount),
+];
+
+seafloorPanels.forEach((panel, panelIndex) => {
+  // The panel now contains interactive elements.
+  panel.removeAttribute("aria-hidden");
+
+  const items = seafloorGroups[panelIndex];
+
+  items.forEach(([filename, label, url], index) => {
+    const item = document.createElement(url ? "a" : "button");
+    item.className = "ocean-floor-item";
+    item.setAttribute("aria-label", label);
+
+    if (url) {
+      item.href = url;
+    } else {
+      item.type = "button";
+      item.addEventListener("click", () => {
+        notice.textContent = `${label} link coming soon.`;
+      });
+    }
+
+    // Give each item its own slot, then vary its position slightly.
+    const position = (index + 0.4 + Math.random() * 0.2) / items.length * 100;
+    item.style.setProperty("--floor-position", `${position}%`);
+    item.style.setProperty("--floor-height", `${4 + Math.random() * 8}px`);
+
+    const image = document.createElement("img");
+    image.src = `./assets/${filename}`;
+    image.alt = "";
+    item.append(image);
+    panel.append(item);
+  });
+});
+
+function syncSeafloorArea(area) {
+  seafloorPanels.forEach((panel, index) => {
+    const offscreen = String(index + 1) !== area;
+
+    if (offscreen && panel.contains(document.activeElement)) {
+      oceanArrow.focus({ preventScroll: true });
+    }
+
+    panel.inert = offscreen;
+  });
+}
+
+syncSeafloorArea(ocean.dataset.area || "1");
+
+document.querySelector("#jellyfish-hotspot").addEventListener("click", () => {
+  notice.textContent = "You found the jellyfish!";
+});
+
+const cafeEntrance = document.querySelector("#cafe-entrance");
+const cafeScene = document.querySelector("#cafe-scene");
+const cafeBack = document.querySelector("#cafe-back");
+
+cafeEntrance.addEventListener("click", () => {
+  if (cafeEntrance.classList.contains("is-opening")) return;
+
+  cafeEntrance.classList.add("is-opening");
+
+  // Let the click glow show briefly before opening the café.
+  window.setTimeout(() => {
+    cafeEntrance.classList.remove("is-opening");
+
+    if (ocean.hidden || cafeEntrance.closest(".ocean-panel").inert) return;
+
+    cancelAnimationFrame(frameId);
+    frameId = 0;
+    ocean.hidden = true;
+
+    cafeScene.hidden = false;
+    document.querySelector("#cafe-join").focus();
+  }, reducedMotion.matches ? 0 : 210);
+});
+
+cafeBack.addEventListener("click", () => {
+  cafeScene.hidden = true;
+  showOcean();
+  cafeEntrance.focus({ preventScroll: true });
+});

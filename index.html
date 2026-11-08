@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Packed like Sardines</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pixelify+Sans&display=swap">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=cafe-pixel">
 
   <style>
     .studio {
@@ -112,6 +112,7 @@
   </style>
 
   <script src="script.js" defer></script>
+  <script src="cafe.js" defer></script>
 </head>
 <body>
     <main>
@@ -185,13 +186,53 @@
     </section>
 
     <section id="ocean" class="ocean" aria-labelledby="ocean-title" hidden>
-      <div id="swimmers" class="swimmers"></div>
+      <div class="ocean-world">
+  <div class="ocean-panel ocean-panel-first">
+  <button id="cafe-entrance" type="button" aria-label="Enter Coral Me Mine Café">
+    <img src="./assets/ship-wreck-cafe-1.png" alt="">
+  </button>
+</div>
+  <div class="ocean-panel ocean-panel-second">
+    <button id="jellyfish-hotspot" class="ocean-floor-item" type="button" aria-label="Jellyfish">
+      <img src="./assets/jellyfish-1.png" alt="">
+    </button>
+  </div>
+  <div id="swimmers" class="swimmers"></div>
+</div>
+
+<button id="ocean-arrow" type="button" aria-label="Swim to the next ocean area">
+  <svg viewBox="0 0 16 16" width="24" height="24" aria-hidden="true">
+    <path fill="currentColor"
+          d="M7 2h2v2h2v2h2v2h2v2h-2v2h-2v2H7v-4H1V6h6z"/>
+  </svg>
+</button>
       <header class="ocean-header">
         <h1 id="ocean-title" tabindex="-1">Packed like Sardines</h1>
         <button id="draw-again" type="button">Draw another fish</button>
       </header>
     </section>
-
+<section id="cafe-scene" class="studio" aria-labelledby="cafe-title" data-lobby-url="" hidden>
+  <div class="studio-layout">
+    <button id="cafe-back" type="button">Back to the ocean</button>
+    <div class="paint-window">
+      <header class="paint-titlebar">
+        <h1 id="cafe-title">Coral Me Mine Café</h1>
+        <span class="paint-dimensions">2 Players</span>
+      </header>
+      <div class="cafe-body">
+        <p>Draw your dream underwater café together in two minutes.</p>
+        <p id="cafe-clock" role="timer" aria-label="Time remaining" hidden>2:00</p>
+        <div class="cafe-actions">
+          <button id="cafe-join" type="button">Find a partner</button>
+          <a id="cafe-canvas" target="_blank" rel="noopener noreferrer" hidden>Open shared canvas (new tab)</a>
+          <button id="cafe-ready" type="button" hidden disabled>I'm ready</button>
+          <button id="cafe-leave" type="button" hidden>Leave lobby</button>
+        </div>
+        <p id="cafe-status" role="status">Find a partner to start a round.</p>
+      </div>
+    </div>
+  </div>
+</section>
     <p id="notice" class="notice" role="status"></p>
   </main>
 </body>

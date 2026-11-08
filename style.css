@@ -290,7 +290,9 @@ h1 { margin: 0; font-weight: 900; }
   text-align: center;
 }
 
-.paint-toolbox button {
+.paint-toolbox button,
+.cafe-actions button,
+.cafe-actions a {
   min-height: 30px;
   padding: 0.3rem 0.2rem;
   border: 2px solid;
@@ -302,7 +304,9 @@ h1 { margin: 0; font-weight: 900; }
 }
 
 .paint-toolbox button[aria-pressed="true"],
-.paint-toolbox button:not(:disabled):active {
+.paint-toolbox button:not(:disabled):active,
+.cafe-actions button:not(:disabled):active,
+.cafe-actions a:active {
   border-color: #555 #fff #fff #555;
   background: #efefef;
 }
@@ -352,7 +356,8 @@ h1 { margin: 0; font-weight: 900; }
   box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px #222;
 }
 
-.paint-status {
+.paint-status,
+#cafe-status {
   margin: 0;
   padding: 0.35rem 0.45rem;
   border: 1px solid;
@@ -608,3 +613,273 @@ h1 { margin: 0; font-weight: 900; }
 .paint-toolbox button[data-size="4"]  { --dot-size: 5px; }
 .paint-toolbox button[data-size="10"] { --dot-size: 11px; }
 .paint-toolbox button[data-size="22"] { --dot-size: 19px; }
+/* The ocean is the viewport. The world behind it is two screens wide. */
+#ocean {
+  background: #67b9cd;
+}
+
+.ocean-world {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 200%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  transition: transform 550ms ease-in-out;
+}
+
+#ocean[data-area="2"] .ocean-world {
+  transform: translateX(-50%);
+}
+
+.ocean-panel {
+  background: center bottom / cover no-repeat;
+}
+
+.ocean-panel-first {
+  background-image: url("./ocean-pastel.png");
+}
+
+.ocean-panel-second {
+  background-image: url("./ocean-pastel-2.png");
+}
+
+.ocean-world .swimmers {
+  z-index: 1;
+}
+
+#ocean-arrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  right: 12px;
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #747474;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+  box-shadow: 3px 3px 0 #171717;
+}
+
+#ocean[data-area="2"] #ocean-arrow {
+  right: auto;
+  left: 12px;
+}
+
+#ocean[data-area="2"] #ocean-arrow svg {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocean-world {
+    transition: none;
+  }
+}
+.cursor-bubble {
+  position: fixed;
+  z-index: 5;
+  height: auto;
+  pointer-events: none;
+  animation: cursor-bubble-rise 650ms ease-out forwards;
+}
+
+@keyframes cursor-bubble-rise {
+  from {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.75);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--bubble-drift)), -150%) scale(1.15);
+  }
+}
+.ocean-panel {
+  position: relative;
+}
+
+.ocean-floor-item {
+  position: absolute;
+  z-index: 2;
+  bottom: var(--floor-height);
+  left: var(--floor-position);
+  display: block;
+  width: clamp(44px, 10vw, 108px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  transform: translateX(-50%);
+  transform-origin: center bottom;
+  transition: transform 180ms ease-out;
+}
+
+#jellyfish-hotspot {
+  --floor-position: 64%;
+  --floor-height: 28%;
+  width: clamp(95px, 16vw, 190px);
+}
+
+.ocean-floor-item::before {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(255 255 255 / 85%),
+    rgb(255 255 255 / 30%) 45%,
+    transparent 72%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+}
+
+.ocean-floor-item img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.ocean-floor-item:hover,
+.ocean-floor-item:focus-visible {
+  z-index: 3;
+  transform: translateX(-50%) scale(1.12);
+}
+
+.ocean-floor-item:hover::before,
+.ocean-floor-item:focus-visible::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocean-floor-item,
+  .ocean-floor-item::before {
+    transition: none;
+  }
+}
+/* The café sits behind the fish and smaller seafloor decorations. */
+#cafe-entrance {
+  position: absolute;
+  z-index: 0;
+  left: 25%;
+  bottom: clamp(13px, 2svh, 48px);
+  width: clamp(290px, 156vw, 580px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translateX(-50%);
+  transform-origin: center bottom;
+  transition: transform 200ms ease-out;
+}
+
+#cafe-entrance::before {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  background: radial-gradient(
+    ellipse,
+    rgb(255 255 255 / 90%),
+    rgb(255 255 255 / 40%) 42%,
+    transparent 72%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease-out;
+}
+
+#cafe-entrance img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+#cafe-entrance:hover,
+#cafe-entrance:focus-visible {
+  transform: translateX(-50%) scale(1.16);
+}
+
+#cafe-entrance.is-opening {
+  transform: translateX(-50%) scale(1.26);
+}
+
+#cafe-entrance:hover::before,
+#cafe-entrance:focus-visible::before,
+#cafe-entrance.is-opening::before {
+  opacity: 1;
+}
+
+#cafe-scene .paint-window {
+  font-family: "Pixelify Sans", monospace;
+}
+
+.studio .paint-titlebar #cafe-title {
+  font-size: 1.15rem;
+}
+
+.cafe-body {
+  display: grid;
+  gap: 12px;
+  padding: clamp(12px, 3vw, 24px);
+  font-size: 0.95rem;
+}
+
+.cafe-body p {
+  margin: 0;
+}
+
+#cafe-clock {
+  font-size: 2rem;
+}
+
+.cafe-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cafe-actions button,
+.cafe-actions a {
+  padding: 8px 12px;
+  font: inherit;
+}
+
+.cafe-actions a {
+  text-decoration: none;
+}
+
+#cafe-back {
+  justify-self: start;
+  padding: 8px 14px;
+  border: 1px solid #747474;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+  box-shadow: 3px 3px 0 #171717;
+  font-family: "Pixelify Sans", monospace;
+}
+
+@media (max-width: 1140px) {
+  #cafe-scene {
+    padding-top: var(--logo-row-height);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cafe-entrance,
+  #cafe-entrance::before {
+    transition: none;
+  }
+}

@@ -1,0 +1,14 @@
+name = "coral-me-mine-lobby"
+main = "worker.mjs"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://ishikaghosh04.github.io,http://localhost:8000,http://127.0.0.1:8000"
+
+[[durable_objects.bindings]]
+name = "CAFE_LOBBY"
+class_name = "CafeLobby"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["CafeLobby"]
