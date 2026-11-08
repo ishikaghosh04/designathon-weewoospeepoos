@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Packed like Sardines</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pixelify+Sans&display=swap">
-  <link rel="stylesheet" href="style.css?v=cafe-pixel">
+  <link rel="stylesheet" href="style.css?v=fish-groups">
 
   <style>
     .studio {
@@ -111,8 +111,12 @@
     }
   </style>
 
-  <script src="script.js" defer></script>
+  <script src="script.js?v=campus-hooks" defer></script>
   <script src="cafe.js" defer></script>
+  <script src="events.js?v=demo-fish" defer></script>
+  <script src="demo-fish.js?v=fish-groups" defer></script>
+  <script src="campus-config.js" defer></script>
+  <script src="campus.js" defer></script>
 </head>
 <body>
     <main>
@@ -133,6 +137,7 @@
           <div class="fish-dialog-buttons">
             <button id="visit" type="button">Visit the ocean</button>
             <button id="release" type="button" disabled>Release into the ocean</button>
+            <button id="campus-account" type="button" hidden>Campus sign-in</button>
           </div>
         </div>
 
@@ -193,8 +198,10 @@
   </button>
 </div>
   <div class="ocean-panel ocean-panel-second">
-    <button id="jellyfish-hotspot" class="ocean-floor-item" type="button" aria-label="Jellyfish">
-      <img src="./assets/jellyfish-1.png" alt="">
+    <button id="octopus-events" class="ocean-floor-item" type="button"
+            aria-label="Open the octopus event board" aria-haspopup="dialog">
+      <img src="./assets/oil-pastel-octopus.png" alt="">
+      <span class="ocean-hotspot-label">Events</span>
     </button>
   </div>
   <div id="swimmers" class="swimmers"></div>
@@ -210,6 +217,104 @@
         <h1 id="ocean-title" tabindex="-1">Packed like Sardines</h1>
         <button id="draw-again" type="button">Draw another fish</button>
       </header>
+      <dialog id="hotspot-dialog" class="paint-window" aria-labelledby="hotspot-title">
+        <header class="paint-titlebar">
+          <h2 id="hotspot-title"></h2>
+        </header>
+        <div class="hotspot-body">
+          <p id="hotspot-description"></p>
+          <p id="hotspot-status" role="status"></p>
+          <div class="hotspot-actions">
+            <button id="hotspot-check-in" type="button">Check in</button>
+            <button id="hotspot-check-out" type="button" hidden>Check out</button>
+            <form method="dialog">
+              <button type="submit" autofocus>Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+      <dialog id="events-dialog" class="paint-window" aria-labelledby="events-title">
+        <header class="paint-titlebar">
+          <h2 id="events-title">Octopus Event Board</h2>
+          <form method="dialog"><button type="submit">Close</button></form>
+        </header>
+        <div class="event-board">
+          <div class="event-tabs" role="tablist" aria-label="Event board">
+            <button id="browse-events-tab" type="button" role="tab" aria-selected="true"
+                    aria-controls="browse-events" autofocus>Browse events</button>
+            <button id="host-event-tab" type="button" role="tab" aria-selected="false"
+                    aria-controls="host-event" tabindex="-1">Host an event</button>
+          </div>
+          <p id="event-fish-status"></p>
+          <div id="browse-events" role="tabpanel" aria-labelledby="browse-events-tab" tabindex="0">
+            <p id="event-notice" role="status"></p>
+            <p id="event-empty" hidden>It's quiet down here. Be the first to host something!</p>
+            <section>
+              <h3>Happening now</h3>
+              <div id="events-now" class="event-list"></div>
+            </section>
+            <section>
+              <h3>Coming up</h3>
+              <div id="events-upcoming" class="event-list"></div>
+            </section>
+          </div>
+          <div id="host-event" role="tabpanel" aria-labelledby="host-event-tab" tabindex="0" hidden>
+            <form id="host-event-form" novalidate>
+              <label>Title <input name="title" maxlength="50" required></label>
+              <label>Description <textarea name="description" maxlength="200" rows="3" required></textarea></label>
+              <label>Location <input name="location" placeholder="e.g. Rozsa Centre lobby" required></label>
+              <div class="event-date-fields">
+                <label>Date <input name="date" type="date" required></label>
+                <label>Start time <input name="start" type="time" required></label>
+                <label>End time <input name="end" type="time" required></label>
+              </div>
+              <p id="event-arms" aria-live="polite"></p>
+              <p id="event-host-status"></p>
+              <p id="event-error" role="alert" hidden></p>
+              <button id="event-submit" type="submit">Host this event</button>
+            </form>
+          </div>
+        </div>
+        <template id="event-card">
+          <article class="event-card">
+            <h4></h4>
+            <p class="event-description"></p>
+            <p class="event-host">Hosted by <button type="button" aria-haspopup="dialog"></button></p>
+            <p class="event-location"></p>
+            <p><time></time></p>
+            <div class="event-card-actions">
+              <span class="event-count"></span>
+              <span class="event-joined" hidden>Joined</span>
+              <button class="event-rsvp" type="button"></button>
+            </div>
+          </article>
+        </template>
+      </dialog>
+      <dialog id="fish-profile-dialog" class="paint-window" aria-labelledby="fish-profile-name">
+        <header class="paint-titlebar">
+          <h2 id="fish-profile-name"></h2>
+          <form method="dialog"><button id="fish-profile-close" type="submit" autofocus>Back to events</button></form>
+        </header>
+        <div class="fish-profile-body">
+          <dl>
+            <dt>Pronouns</dt><dd id="fish-profile-pronouns"></dd>
+            <dt>Year of studies</dt><dd id="fish-profile-year"></dd>
+            <dt>Hobbies</dt><dd id="fish-profile-hobbies"></dd>
+            <dt>Status</dt><dd id="fish-profile-status"></dd>
+          </dl>
+          <p id="fish-profile-note"></p>
+          <div id="fish-profile-social" hidden>
+            <button id="demo-friend-request" type="button">Send friend request</button>
+            <form id="demo-message-form">
+              <label for="demo-message">Send a brief message</label>
+              <textarea id="demo-message" rows="2" maxlength="160" placeholder="Hey! Want to hang out?" required></textarea>
+              <button type="submit">Send message</button>
+            </form>
+            <ul id="demo-message-history" aria-label="Saved messages" hidden></ul>
+            <p id="demo-social-status" role="status"></p>
+          </div>
+        </div>
+      </dialog>
     </section>
 <section id="cafe-scene" class="studio" aria-labelledby="cafe-title" data-lobby-url="" hidden>
   <div class="studio-layout">
@@ -233,6 +338,53 @@
     </div>
   </div>
 </section>
+    <dialog id="campus-editor" class="paint-window" aria-labelledby="campus-editor-title">
+      <header class="paint-titlebar">
+        <h2 id="campus-editor-title">Campus profile</h2>
+        <form method="dialog"><button type="submit">Close</button></form>
+      </header>
+      <div class="campus-body">
+        <form id="campus-sign-in">
+          <label>University email <input name="email" type="email" autocomplete="email" required></label>
+          <button type="submit">Email me a code</button>
+        </form>
+        <form id="campus-verify" hidden>
+          <label>One-time code <input name="code" inputmode="numeric" autocomplete="one-time-code" required></label>
+          <button type="submit">Verify code</button>
+        </form>
+        <form id="campus-profile-form" hidden>
+          <label>Display name <input name="displayName" maxlength="40" required></label>
+          <p>Add cards for things like likes, dislikes, classes, or hobbies.</p>
+          <div id="campus-cards"></div>
+          <button id="campus-add-card" type="button">Add card</button>
+          <p>Saving a private draft takes your fish out of the shared ocean until you release it again.</p>
+          <div class="campus-actions">
+            <button type="submit">Save private draft</button>
+            <button id="campus-release-saved" type="button" hidden>Release saved fish</button>
+          </div>
+        </form>
+        <button id="campus-sign-out" type="button" hidden>Sign out</button>
+        <p id="campus-status" role="status"></p>
+      </div>
+      <template id="campus-card-template">
+        <fieldset class="campus-card">
+          <label>Card title <input maxlength="50" placeholder="e.g. Classes" required></label>
+          <label>Card text <textarea maxlength="500" rows="2" required></textarea></label>
+          <div class="campus-actions">
+            <button type="button" data-card-action="up">Move up</button>
+            <button type="button" data-card-action="down">Move down</button>
+            <button type="button" data-card-action="remove">Remove</button>
+          </div>
+        </fieldset>
+      </template>
+    </dialog>
+    <dialog id="campus-viewer" class="paint-window" aria-labelledby="campus-viewer-title">
+      <header class="paint-titlebar">
+        <h2 id="campus-viewer-title">Fish profile</h2>
+        <form method="dialog"><button type="submit">Close</button></form>
+      </header>
+      <div id="campus-viewer-body" class="campus-body"></div>
+    </dialog>
     <p id="notice" class="notice" role="status"></p>
   </main>
 </body>

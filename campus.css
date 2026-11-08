@@ -1,0 +1,84 @@
+#campus-editor,
+#campus-viewer {
+  width: min(34rem, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  font: 1rem "Pixelify Sans", monospace;
+}
+
+#campus-editor::backdrop,
+#campus-viewer::backdrop {
+  background: rgb(12 49 65 / 45%);
+}
+
+#campus-editor h2,
+#campus-viewer h2,
+.campus-body p {
+  margin: 0;
+}
+
+#campus-editor h2,
+#campus-viewer h2 {
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.campus-body,
+.campus-body form,
+.campus-body label,
+.campus-card,
+#campus-cards {
+  display: grid;
+  gap: 8px;
+}
+
+.campus-body {
+  padding: 12px;
+}
+
+.campus-body button {
+  justify-self: start;
+}
+
+.campus-body input,
+.campus-body textarea {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+}
+
+.campus-card {
+  min-width: 0;
+  margin: 0;
+  border: 2px inset #ddd;
+}
+
+.campus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#campus-editor button,
+#campus-viewer button {
+  padding: 6px 10px;
+  border: 2px outset #ddd;
+  border-radius: 0;
+  background: #d0d0d0;
+  color: #111;
+  font: inherit;
+}
+
+#campus-viewer-body p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.campus-fish-profile {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+}

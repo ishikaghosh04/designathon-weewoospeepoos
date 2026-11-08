@@ -292,7 +292,10 @@ h1 { margin: 0; font-weight: 900; }
 
 .paint-toolbox button,
 .cafe-actions button,
-.cafe-actions a {
+.cafe-actions a,
+.hotspot-actions button,
+#events-dialog button,
+#fish-profile-dialog button {
   min-height: 30px;
   padding: 0.3rem 0.2rem;
   border: 2px solid;
@@ -306,7 +309,11 @@ h1 { margin: 0; font-weight: 900; }
 .paint-toolbox button[aria-pressed="true"],
 .paint-toolbox button:not(:disabled):active,
 .cafe-actions button:not(:disabled):active,
-.cafe-actions a:active {
+.cafe-actions a:active,
+.hotspot-actions button:not(:disabled):active,
+#events-dialog button:not(:disabled):active,
+#fish-profile-dialog button:not(:disabled):active,
+#events-dialog [role="tab"][aria-selected="true"] {
   border-color: #555 #fff #fff #555;
   background: #efefef;
 }
@@ -705,10 +712,10 @@ h1 { margin: 0; font-weight: 900; }
 .ocean-floor-item {
   position: absolute;
   z-index: 2;
-  bottom: var(--floor-height);
+  bottom: var(--floor-height, 8px);
   left: var(--floor-position);
   display: block;
-  width: clamp(44px, 10vw, 108px);
+  width: clamp(49px, 11vw, 120px);
   aspect-ratio: 1;
   padding: 0;
   border: 0;
@@ -720,10 +727,42 @@ h1 { margin: 0; font-weight: 900; }
   transition: transform 180ms ease-out;
 }
 
-#jellyfish-hotspot {
+[data-activity="mindfulness"] {
   --floor-position: 64%;
   --floor-height: 28%;
   width: clamp(95px, 16vw, 190px);
+}
+
+[data-activity="intramurals"] {
+  --floor-position: min(80%, calc(100% - 84px));
+  z-index: 0;
+  top: calc(var(--logo-row-height) + clamp(18px, 5svh, 42px));
+  bottom: auto;
+  width: clamp(135px, 25vw, 350px);
+  aspect-ratio: 3;
+  transform-origin: center;
+}
+
+[data-activity="intramurals"] .ocean-hotspot-label {
+  top: 100%;
+  bottom: auto;
+  width: min(36vw, 12rem);
+}
+
+#octopus-events {
+  --floor-position: clamp(85px, 15vw, 210px);
+  top: calc(var(--logo-row-height) + clamp(18px, 4svh, 36px));
+  bottom: auto;
+  width: clamp(132px, 20vw, 230px);
+  aspect-ratio: 3 / 2;
+  transform-origin: center;
+}
+
+#octopus-events .ocean-hotspot-label {
+  top: 100%;
+  bottom: auto;
+  width: max-content;
+  min-width: 4rem;
 }
 
 .ocean-floor-item::before {
@@ -757,8 +796,301 @@ h1 { margin: 0; font-weight: 900; }
 }
 
 .ocean-floor-item:hover::before,
-.ocean-floor-item:focus-visible::before {
+.ocean-floor-item:focus-visible::before,
+.ocean-floor-item[data-active]::before {
   opacity: 1;
+}
+
+.ocean-hotspot-label {
+  position: absolute;
+  bottom: 88%;
+  left: 50%;
+  width: min(22vw, 9rem);
+  padding: 4px 3px;
+  border: 1px solid #92d7e3;
+  background: #173d47;
+  color: #fff;
+  font: 600 clamp(0.7rem, 2.4vw, 0.95rem) / 1.05 "Pixelify Sans", monospace;
+  transform: translateX(-50%);
+}
+
+[data-active] > .ocean-hotspot-label {
+  background: #000080;
+  border-color: #fff;
+}
+
+#hotspot-dialog {
+  width: min(28rem, calc(100% - 24px));
+  margin: auto;
+  font-family: "Pixelify Sans", monospace;
+  font-size: 1rem;
+}
+
+#hotspot-dialog::backdrop {
+  background: rgb(12 49 65 / 45%);
+}
+
+#hotspot-title,
+.hotspot-body p {
+  margin: 0;
+}
+
+#hotspot-title {
+  font-size: 1.1rem;
+}
+
+.hotspot-body {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+
+.hotspot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hotspot-actions button {
+  padding: 6px 10px;
+  font: inherit;
+}
+
+#events-dialog {
+  width: min(44rem, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  font: 1rem "Pixelify Sans", monospace;
+}
+
+#events-dialog::backdrop,
+#fish-profile-dialog::backdrop {
+  background: rgb(12 49 65 / 45%);
+}
+
+#events-dialog button,
+#fish-profile-dialog button {
+  padding: 6px 10px;
+  font: inherit;
+}
+
+#events-dialog h2,
+#events-dialog h3,
+#events-dialog h4,
+#events-dialog p {
+  margin: 0;
+}
+
+#events-dialog h2 {
+  font-size: 1.15rem;
+}
+
+.event-board,
+#browse-events,
+#browse-events section,
+#host-event-form {
+  display: grid;
+  gap: 10px;
+}
+
+.event-board {
+  padding: clamp(8px, 2vw, 16px);
+}
+
+.event-tabs,
+.event-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-list,
+.event-date-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 8px;
+}
+
+.event-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 10px;
+  border: 2px solid;
+  border-color: #fff #777 #777 #fff;
+  background: #ededed;
+  overflow-wrap: anywhere;
+}
+
+#events-dialog .event-host button {
+  min-height: auto;
+  padding: 2px 3px;
+  border: 0;
+  background: transparent;
+  color: #000080;
+  text-decoration: underline;
+}
+
+#fish-profile-dialog {
+  width: min(26rem, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  font: 1rem "Pixelify Sans", monospace;
+}
+
+#fish-profile-name {
+  margin: 0;
+  font-size: 1.15rem;
+  overflow-wrap: anywhere;
+}
+
+.fish-profile-body {
+  padding: 12px;
+}
+
+.fish-profile-body dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 8px 12px;
+  margin: 0;
+}
+
+.fish-profile-body dt {
+  font-weight: bold;
+}
+
+.fish-profile-body dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+#fish-profile-status[data-online="true"] {
+  color: #125f43;
+}
+
+#fish-profile-note {
+  margin: 12px 0 0;
+  font-size: 0.875rem;
+}
+
+.demo-fish {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: clamp(36px, 5vw, 62px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translateX(-50%);
+  transition: transform 180ms ease-out;
+}
+
+.demo-fish:hover,
+.demo-fish:focus-visible {
+  z-index: 3;
+  transform: translateX(-50%) scale(1.1);
+}
+
+.demo-fish img {
+  display: block;
+  width: 100%;
+  height: clamp(28px, 3.8vw, 46px);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px #0b395965);
+  transform: scaleX(var(--fish-facing, 1));
+  animation: demo-fish-drift var(--fish-period, 3.5s) ease-in-out var(--fish-delay, 0s) infinite alternate;
+}
+
+@keyframes demo-fish-drift {
+  from { translate: -3px 2px; rotate: -3deg; }
+  to { translate: 4px -4px; rotate: 2deg; }
+}
+
+#fish-profile-social,
+#demo-message-form {
+  display: grid;
+  gap: 8px;
+}
+
+#fish-profile-social {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #777;
+}
+
+#fish-profile-social button {
+  justify-self: start;
+}
+
+#demo-message {
+  width: 100%;
+  padding: 6px;
+  border: 2px inset #ddd;
+  font: inherit;
+  resize: vertical;
+}
+
+#demo-message-history {
+  margin: 0;
+  padding-left: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+#demo-social-status {
+  margin: 0;
+}
+
+#demo-social-status:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-fish {
+    transition: none;
+  }
+  .demo-fish img {
+    animation: none;
+  }
+}
+
+.event-joined {
+  color: #125f43;
+}
+
+#host-event-form label {
+  display: grid;
+  gap: 4px;
+}
+
+#host-event-form input,
+#host-event-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 6px;
+  border: 2px solid;
+  border-color: #777 #fff #fff #777;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+}
+
+#host-event-form textarea {
+  resize: vertical;
+}
+
+#event-submit {
+  justify-self: start;
+}
+
+#event-error {
+  color: #8a1e1e;
+}
+
+#event-notice:empty,
+#event-host-status:empty {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

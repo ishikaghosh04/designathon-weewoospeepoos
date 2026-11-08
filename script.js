@@ -333,10 +333,11 @@ function addFish(data, index, sample = false) {
 
 function layoutOcean() {
   const viewWidth = ocean.clientWidth;
-const areaLeft = ocean.dataset.area === "2" ? viewWidth : 0;
-oceanWidth = swimmers.clientWidth;
+  const areaLeft = ocean.dataset.area === "2" ? viewWidth : 0;
+  oceanWidth = swimmers.clientWidth;
   oceanHeight = ocean.clientHeight;
   swimTop = document.querySelector(".ocean-header").offsetHeight + 8;
+  const hotspot = activeCheckIn && activityHotspots.get(activeCheckIn.activityId);
 
   for (const fish of fishList) {
     const { data } = fish;
@@ -355,12 +356,25 @@ oceanWidth = swimmers.clientWidth;
     const start = fish.sample ? (fish.index % 4 + 0.5) / 4 : random(0.2, 0.8);
     const spawnX = areaLeft + 8 + start * Math.max(0, viewWidth - data.width * scale - 16);
     fish.x = clamp(fish.x ?? spawnX, fish.minX, fish.maxX);
+    fish.anchor = null;
+    if (hotspot && !fish.sample && fish.index === activeCheckIn.fishIndex) {
+      const { panel, button } = hotspot;
+      const left = panel.offsetLeft + 8;
+      const right = panel.offsetLeft + panel.clientWidth - data.width * scale - 8;
+      const x = clamp(panel.offsetLeft + button.offsetLeft - data.width * scale / 2, left, Math.max(left, right));
+      const nearbyY = button.offsetTop < oceanHeight / 2
+        ? button.offsetTop + button.offsetHeight + 32
+        : button.offsetTop - fish.element.offsetHeight - 24;
+      const y = clamp(nearbyY, fish.minY, fish.maxY);
+      fish.anchor = { x, y };
+      fish.x = x;
+    }
     placeFish(fish, 0);
   }
 }
 
 function placeFish(fish, time) {
-  const laneY = fish.minY + fish.lane * (fish.maxY - fish.minY);
+  const laneY = fish.anchor?.y ?? fish.minY + fish.lane * (fish.maxY - fish.minY);
   const bob = reducedMotion.matches ? 0 : Math.sin(time * fish.frequency + fish.phase) * fish.bob;
   const y = clamp(laneY + bob, fish.minY, fish.maxY);
 
@@ -375,7 +389,7 @@ function animateOcean(now) {
   for (const fish of fishList) {
     if (fish.entering) continue;
 
-    if (!reducedMotion.matches) {
+    if (!reducedMotion.matches && !fish.anchor) {
       fish.x += fish.direction * fish.speed * elapsed;
       if (fish.x >= fish.maxX) fish.direction = -1;
       if (fish.x <= fish.minX) fish.direction = 1;
@@ -395,6 +409,7 @@ function showOcean() {
   previousTime = null;
   if (!frameId) frameId = requestAnimationFrame(animateOcean);
   document.querySelector("#ocean-title").focus();
+  window.dispatchEvent(new Event("ocean:show"));
 }
 
 function showStudio() {
@@ -426,6 +441,7 @@ releaseButton.addEventListener("click", () => {
   nameInput.value = "";
   refreshDrawing();
   showOcean();
+  window.dispatchEvent(new CustomEvent("ocean:release", { detail: { data, fish } }));
 
   if (reducedMotion.matches) return;
 
@@ -473,7 +489,7 @@ oceanArrow.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event) => {
-  if (ocean.hidden || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (ocean.hidden || document.querySelector("dialog[open]") || event.altKey || event.ctrlKey || event.metaKey) return;
   if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
 
   event.preventDefault();
@@ -510,62 +526,140 @@ window.addEventListener("pointermove", (event) => {
   bubble.addEventListener("animationend", () => bubble.remove(), { once: true });
   document.body.append(bubble);
 });
-const seafloorAssets = [
-  ["coral-1.png", "Peach coral", ""],
-  ["coral-2.png", "Lavender coral", ""],
-  ["coral-3.png", "Golden coral", ""],
-  ["seaweed-1.png", "Green seaweed", ""],
-  ["seaweed-2.png", "Teal seaweed", ""],
-  ["oyester-1.png", "Oyster", ""],
-  ["starfish-1.png", "Starfish", ""],
+const activityGroups = [
+  [
+    ["dinos", "coral-1.png", "Dinos games", "Find a group to go to a Dinos game together.", "12.5%"],
+    ["board-games", "coral-2.png", "Board games & trivia", "Play board games or team up for a trivia night.", "37.5%"],
+    ["study", "starfish-1.png", "TFDL study jams", "Meet at TFDL for a study jam or work quietly side by side (body doubling).", "62.5%"],
+    ["meal-breaks", "oyester-1.png", "Group meal breaks", "Take a study break and grab a meal together.", "87.5%"],
+    ["intramurals", "blue-sardine-school.png", "Intramurals & drop-in sports", "Find a group for intramurals or drop-in sports at the Kinesiology facilities."],
+  ],
+  [
+    ["open-mic", "coral-3.png", "Open mic & jams", "Meet up for an open mic or jam night at the Den or Last Defence.", "16.67%"],
+    ["cultural-events", "seaweed-1.png", "Cultural events", "Get together for cultural club events and festivals.", "50%"],
+    ["de-stress", "seaweed-2.png", "Exam de-stress", "Take a breather together at an exam-season de-stress zone.", "83.33%"],
+    ["mindfulness", "jellyfish-1.png", "Journaling & mindfulness", "Drop in to journal or take a quiet mindfulness break."],
+  ],
 ];
 
 const seafloorPanels = [...ocean.querySelectorAll(".ocean-panel")];
-
-// Shuffle once per page load.
-for (let i = seafloorAssets.length - 1; i > 0; i -= 1) {
-  const j = Math.floor(Math.random() * (i + 1));
-  [seafloorAssets[i], seafloorAssets[j]] = [seafloorAssets[j], seafloorAssets[i]];
-}
-
-const firstAreaCount = Math.ceil(seafloorAssets.length / 2);
-const seafloorGroups = [
-  seafloorAssets.slice(0, firstAreaCount),
-  seafloorAssets.slice(firstAreaCount),
-];
+const activityHotspots = new Map();
+const hotspotDialog = document.querySelector("#hotspot-dialog");
+const hotspotTitle = document.querySelector("#hotspot-title");
+const hotspotDescription = document.querySelector("#hotspot-description");
+const hotspotStatus = document.querySelector("#hotspot-status");
+const checkInButton = document.querySelector("#hotspot-check-in");
+const checkOutButton = document.querySelector("#hotspot-check-out");
+const checkInKey = "little-ocean-check-in-v1";
+const checkInDuration = 60 * 60 * 1000;
+let selectedActivityId;
+let activeCheckIn;
+let checkInTimeout;
 
 seafloorPanels.forEach((panel, panelIndex) => {
-  // The panel now contains interactive elements.
   panel.removeAttribute("aria-hidden");
-
-  const items = seafloorGroups[panelIndex];
-
-  items.forEach(([filename, label, url], index) => {
-    const item = document.createElement(url ? "a" : "button");
-    item.className = "ocean-floor-item";
-    item.setAttribute("aria-label", label);
-
-    if (url) {
-      item.href = url;
-    } else {
-      item.type = "button";
-      item.addEventListener("click", () => {
-        notice.textContent = `${label} link coming soon.`;
-      });
-    }
-
-    // Give each item its own slot, then vary its position slightly.
-    const position = (index + 0.4 + Math.random() * 0.2) / items.length * 100;
-    item.style.setProperty("--floor-position", `${position}%`);
-    item.style.setProperty("--floor-height", `${4 + Math.random() * 8}px`);
+  const items = activityGroups[panelIndex];
+  items.forEach(([id, filename, title, description, position]) => {
+    const button = document.createElement("button");
+    button.className = "ocean-floor-item";
+    button.type = "button";
+    button.dataset.activity = id;
+    button.setAttribute("aria-haspopup", "dialog");
+    if (position) button.style.setProperty("--floor-position", position);
 
     const image = document.createElement("img");
     image.src = `./assets/${filename}`;
     image.alt = "";
-    item.append(image);
-    panel.append(item);
+    const label = document.createElement("span");
+    label.className = "ocean-hotspot-label";
+    button.append(image, label);
+    panel.append(button);
+    activityHotspots.set(id, { panel, button, label, title, description });
+    button.addEventListener("click", () => {
+      selectedActivityId = id;
+      renderHotspotDialog();
+      hotspotDialog.showModal();
+    });
   });
 });
+
+function renderHotspotDialog() {
+  const { title, description } = activityHotspots.get(selectedActivityId);
+  const isHere = activeCheckIn?.activityId === selectedActivityId;
+  hotspotTitle.textContent = title;
+  hotspotDescription.textContent = description;
+  hotspotStatus.textContent = isHere
+    ? `1 checked in on this device · ${savedFish[activeCheckIn.fishIndex].name}. Your check-in lasts up to an hour.`
+    : "0 checked in on this device.";
+  if (!savedFish.length) hotspotStatus.textContent += " Draw and release a fish to check in.";
+  checkInButton.disabled = !savedFish.length;
+  checkInButton.hidden = isHere;
+  checkOutButton.hidden = !isHere;
+}
+
+function refreshCheckIn() {
+  clearTimeout(checkInTimeout);
+  if (activeCheckIn?.expiresAt <= Date.now()) activeCheckIn = null;
+  if (activeCheckIn) {
+    checkInTimeout = setTimeout(refreshCheckIn, activeCheckIn.expiresAt - Date.now());
+  }
+  for (const [id, { button, label, title }] of activityHotspots) {
+    const isHere = activeCheckIn?.activityId === id;
+    button.toggleAttribute("data-active", isHere);
+    label.textContent = `${title} · ${isHere ? 1 : 0}`;
+    button.setAttribute("aria-label", `${title}, ${isHere ? 1 : 0} checked in`);
+  }
+  if (hotspotDialog.open) renderHotspotDialog();
+  if (!ocean.hidden) layoutOcean();
+}
+
+function saveCheckIn(checkIn) {
+  activeCheckIn = checkIn;
+  try {
+    if (checkIn) localStorage.setItem(checkInKey, JSON.stringify(checkIn));
+    else localStorage.removeItem(checkInKey);
+  } catch {
+    // Keep the check-in for this visit if browser storage is unavailable.
+  }
+  refreshCheckIn();
+}
+
+function restoreCheckIn() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(checkInKey));
+    if (activityHotspots.has(saved?.activityId) && Number.isInteger(saved.fishIndex) &&
+        savedFish[saved.fishIndex] && Number.isFinite(saved.expiresAt)) {
+      return saved;
+    }
+  } catch {
+    // An unavailable or invalid saved check-in starts with an empty map.
+  }
+  return null;
+}
+
+checkInButton.addEventListener("click", () => {
+  saveCheckIn({
+    activityId: selectedActivityId,
+    fishIndex: savedFish.length - 1,
+    expiresAt: Date.now() + checkInDuration,
+  });
+  checkOutButton.focus();
+});
+
+checkOutButton.addEventListener("click", () => {
+  saveCheckIn(null);
+  checkInButton.focus();
+});
+
+window.addEventListener("storage", (event) => {
+  if (event.key === checkInKey || event.key === null) {
+    activeCheckIn = restoreCheckIn();
+    refreshCheckIn();
+  }
+});
+
+activeCheckIn = restoreCheckIn();
+refreshCheckIn();
 
 function syncSeafloorArea(area) {
   seafloorPanels.forEach((panel, index) => {
@@ -580,10 +674,6 @@ function syncSeafloorArea(area) {
 }
 
 syncSeafloorArea(ocean.dataset.area || "1");
-
-document.querySelector("#jellyfish-hotspot").addEventListener("click", () => {
-  notice.textContent = "You found the jellyfish!";
-});
 
 const cafeEntrance = document.querySelector("#cafe-entrance");
 const cafeScene = document.querySelector("#cafe-scene");
